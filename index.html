@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulado - Lei do SUSP (Lei nº 13.675/2018)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px 35px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            color: #1a3c6e;
+            border-bottom: 3px solid #1a3c6e;
+            padding-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #555;
+            margin: 10px 0 20px 0;
+            font-size: 16px;
+        }
+
+        .subtitle strong {
+            color: #1a3c6e;
+        }
+
+        .questao {
+            background: #f8faff;
+            border: 1px solid #dde4f0;
+            border-radius: 10px;
+            padding: 18px 20px 12px 20px;
+            margin: 16px 0;
+            transition: background 0.2s;
+        }
+
+        .questao.correta {
+            background: #e6f7e6;
+            border-color: #28a745;
+        }
+
+        .questao.errada {
+            background: #fde8e8;
+            border-color: #dc3545;
+        }
+
+        .questao .pergunta {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #1a2a4a;
+        }
+
+        .questao .tipo {
+            display: inline-block;
+            font-size: 12px;
+            background: #e9ecef;
+            padding: 2px 10px;
+            border-radius: 12px;
+            color: #495057;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+
+        .alternativas {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .alternativa {
+            background: #fff;
+            border: 2px solid #d0d7e6;
+            border-radius: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 15px;
+        }
+
+        .alternativa:hover:not(.bloqueado) {
+            background: #eaf0fa;
+            border-color: #1a3c6e;
+        }
+
+        .alternativa.correta {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .alternativa.errada {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .alternativa.bloqueado {
+            cursor: default;
+            opacity: 0.9;
+        }
+
+        .alternativa .feedback {
+            display: none;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .alternativa.correta .feedback {
+            display: inline;
+            color: #28a745;
+        }
+
+        .alternativa.errada .feedback {
+            display: inline;
+            color: #dc3545;
+        }
+
+        .alternativa .label {
+            font-weight: bold;
+            color: #555;
+            margin-right: 6px;
+        }
+
+        .resultado {
+            background: #1a3c6e;
+            color: #fff;
+            padding: 16px 24px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            font-size: 18px;
+        }
+
+        .resultado .acertos {
+            background: #28a745;
+            padding: 6px 18px;
+            border-radius: 30px;
+        }
+
+        .resultado .erros {
+            background: #dc3545;
+            padding: 6px 18px;
+            border-radius: 30px;
+        }
+
+        .resultado .total {
+            background: #6c757d;
+            padding: 6px 18px;
+            border-radius: 30px;
+        }
+
+        .btn-reiniciar {
+            background: #ffc107;
+            color: #1a3c6e;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        .btn-reiniciar:hover {
+            background: #e0a800;
+            transform: scale(1.02);
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            .resultado {
+                flex-direction: column;
+                gap: 8px;
+                font-size: 16px;
+            }
+            .alternativa {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+            h1 {
+                font-size: 22px;
+            }
+        }
+
+        .badge-vf {
+            display: inline-block;
+            background: #6c757d;
+            color: #fff;
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-left: 10px;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <h1>📝 SIMULADO - LEI DO SUSP</h1>
+        <p class="subtitle"><strong>Lei nº 13.675/2018 - Sistema Único de Segurança Pública</strong></p>
+        <p class="subtitle">40 questões de múltipla escolha e verdadeiro/falso - Clique na alternativa para responder</p>
+
+        <div id="questoes-container"></div>
+
+        <div class="resultado" id="resultado">
+            <span>✅ <span class="acertos" id="acertos">0</span> ACERTOS</span>
+            <span>❌ <span class="erros" id="erros">0</span> ERROS</span>
+            <span>📊 <span class="total" id="total">0</span> RESPONDIDAS</span>
+        </div>
+
+        <div class="text-center">
+            <button class="btn-reiniciar" onclick="reiniciar()">🔄 REINICIAR SIMULADO</button>
+        </div>
+
+    </div>
+
+    <script>
+        // ================================================================
+        //  DADOS DAS 40 QUESTÕES - LEI DO SUSP (Lei nº 13.675/2018)
+        // ================================================================
+        var questoesData = [
+            {
+                id: 1,
+                pergunta: "De acordo com a Lei nº 13.675/2018, qual é a finalidade do Sistema Único de Segurança Pública (SUSP)?",
+                alternativas: [
+                    "Preservar a ordem pública e a incolumidade das pessoas e do patrimônio, por meio de atuação conjunta, coordenada, sistêmica e integrada dos órgãos de segurança pública.",
+                    "Centralizar todas as ações de segurança pública na União.",
+                    "Substituir as polícias estaduais pela Polícia Federal.",
+                    "Atuar apenas em situações de emergência e desastres.",
+                    "Promover a segurança privada em todo o território nacional."
+                ],
+                correta: 0
+            },
+            {
+                id: 2,
+                pergunta: "Segundo o Art. 2º da Lei nº 13.675/2018, a segurança pública é:",
+                alternativas: [
+                    "Dever exclusivo da União.",
+                    "Responsabilidade apenas dos Estados e do Distrito Federal.",
+                    "Dever do Estado e responsabilidade de todos, compreendendo a União, os Estados, o Distrito Federal e os Municípios.",
+                    "Dever exclusivo das polícias militares.",
+                    "Responsabilidade apenas dos Municípios."
+                ],
+                correta: 2
+            },
+            {
+                id: 3,
+                pergunta: "Compete à União estabelecer a Política Nacional de Segurança Pública e Defesa Social (PNSPDS).",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 4,
+                pergunta: "São princípios da PNSPDS, EXCETO:",
+                alternativas: [
+                    "Respeito ao ordenamento jurídico e aos direitos e garantias individuais e coletivos.",
+                    "Proteção, valorização e reconhecimento dos profissionais de segurança pública.",
+                    "Centralização das decisões no Governo Federal.",
+                    "Eficiência na prevenção e no controle das infrações penais.",
+                    "Participação e controle social."
+                ],
+                correta: 2
+            },
+            {
+                id: 5,
+                pergunta: "O uso comedido e proporcional da força é um dos princípios da PNSPDS.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 6,
+                pergunta: "Qual das alternativas NÃO é uma diretriz da PNSPDS?",
+                alternativas: [
+                    "Atendimento imediato ao cidadão.",
+                    "Planejamento estratégico e sistêmico.",
+                    "Fortalecimento das ações de prevenção e resolução pacífica de conflitos.",
+                    "Centralização de todas as ações de segurança pública na União.",
+                    "Atuação integrada entre a União, os Estados, o Distrito Federal e os Municípios."
+                ],
+                correta: 3
+            },
+            {
+                id: 7,
+                pergunta: "A PNSPDS deve priorizar políticas de redução da letalidade violenta, com ênfase para os grupos vulneráveis.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 8,
+                pergunta: "De acordo com o Art. 6º da Lei nº 13.675/2018, são objetivos da PNSPDS, EXCETO:",
+                alternativas: [
+                    "Fomentar a integração em ações estratégicas e operacionais.",
+                    "Apoiar as ações de manutenção da ordem pública.",
+                    "Centralizar todas as informações de segurança pública em um único órgão federal.",
+                    "Estimular a produção e a publicação de estudos e diagnósticos.",
+                    "Promover a interoperabilidade dos sistemas de segurança pública."
+                ],
+                correta: 2
+            },
+            {
+                id: 9,
+                pergunta: "O Plano Nacional de Segurança Pública e Defesa Social terá duração de 10 (dez) anos a contar de sua publicação.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 10,
+                pergunta: "São meios e instrumentos para a implementação da PNSPDS, EXCETO:",
+                alternativas: [
+                    "O Sistema Nacional de Informações e de Gestão de Segurança Pública e Defesa Social.",
+                    "O Sistema Integrado de Educação e Valorização Profissional (Sievap).",
+                    "A Rede Nacional de Altos Estudos em Segurança Pública (Renaesp).",
+                    "O Programa Nacional de Qualidade de Vida para Profissionais de Segurança Pública (Pró-Vida).",
+                    "O Conselho Nacional de Justiça (CNJ)."
+                ],
+                correta: 4
+            },
+            {
+                id: 11,
+                pergunta: "O SUSP tem como órgão central o Ministério Extraordinário da Segurança Pública.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 12,
+                pergunta: "São integrantes estratégicos do SUSP, conforme o Art. 9º, § 1º:",
+                alternativas: [
+                    "Polícia Federal e Polícia Rodoviária Federal.",
+                    "União, Estados, Distrito Federal e Municípios, por intermédio dos respectivos Poderes Executivos, e os Conselhos de Segurança Pública e Defesa Social.",
+                    "Polícias Civis e Polícias Militares.",
+                    "Corpos de Bombeiros Militares e Guardas Municipais.",
+                    "Institutos oficiais de criminalística e medicina legal."
+                ],
+                correta: 1
+            },
+            {
+                id: 13,
+                pergunta: "Os Conselhos de Segurança Pública e Defesa Social são integrantes estratégicos do SUSP.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 14,
+                pergunta: "São integrantes operacionais do SUSP, EXCETO:",
+                alternativas: [
+                    "Polícia Federal.",
+                    "Polícias Civis.",
+                    "Polícias Militares.",
+                    "Guardas Municipais.",
+                    "Poder Judiciário."
+                ],
+                correta: 4
+            },
+            {
+                id: 15,
+                pergunta: "Os corpos de bombeiros militares integram o SUSP como integrantes operacionais.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 16,
+                pergunta: "De acordo com o Art. 10 da Lei nº 13.675/2018, a integração e a coordenação dos órgãos integrantes do SUSP dar-se-ão por meio de:",
+                alternativas: [
+                    "Operações com planejamento e execução integrados.",
+                    "Estratégias comuns para atuação na prevenção e no controle qualificado de infrações penais.",
+                    "Compartilhamento de informações, inclusive com o Sistema Brasileiro de Inteligência (Sisbin).",
+                    "Intercâmbio de conhecimentos técnicos e científicos.",
+                    "Todas as alternativas anteriores estão corretas."
+                ],
+                correta: 4
+            },
+            {
+                id: 17,
+                pergunta: "O SUSP será coordenado pelo Ministério Extraordinário da Segurança Pública.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 18,
+                pergunta: "Segundo o Art. 11 da Lei nº 13.675/2018, o Ministério Extraordinário da Segurança Pública fixará metas de excelência:",
+                alternativas: [
+                    "A cada 2 anos.",
+                    "Anualmente.",
+                    "A cada 5 anos.",
+                    "Semestralmente.",
+                    "A cada 10 anos."
+                ],
+                correta: 1
+            },
+            {
+                id: 19,
+                pergunta: "As atividades de polícia judiciária e de apuração das infrações penais serão aferidas, entre outros fatores, pelos índices de elucidação dos delitos.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 20,
+                pergunta: "Compete ao Ministério Extraordinário da Segurança Pública, EXCETO:",
+                alternativas: [
+                    "Apoiar os programas de aparelhamento e modernização dos órgãos de segurança pública.",
+                    "Implementar o Sistema Nacional de Informações e de Gestão de Segurança Pública e Defesa Social.",
+                    "Julgar os processos disciplinares dos policiais militares.",
+                    "Promover a qualificação profissional dos integrantes da segurança pública.",
+                    "Desenvolver a doutrina de inteligência policial."
+                ],
+                correta: 2
+            },
+            {
+                id: 21,
+                pergunta: "O Sinesp tem como finalidade armazenar, tratar e integrar dados e informações relacionados à segurança pública, sistema prisional, rastreabilidade de armas e munições, banco de dados de perfil genético e digitais, e enfrentamento do tráfico de drogas ilícitas.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 22,
+                pergunta: "O integrante do Sinesp que deixar de fornecer ou atualizar seus dados e informações poderá:",
+                alternativas: [
+                    "Ser penalizado com multa diária.",
+                    "Não receber recursos nem celebrar parcerias com a União para financiamento de programas, projetos ou ações de segurança pública.",
+                    "Ser exonerado do cargo.",
+                    "Perder o direito à aposentadoria.",
+                    "Ser impedido de exercer funções policiais."
+                ],
+                correta: 1
+            },
+            {
+                id: 23,
+                pergunta: "O Sinesp é facultativo para os Estados e Municípios.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 1,
+                isVF: true
+            },
+            {
+                id: 24,
+                pergunta: "O Sistema Integrado de Educação e Valorização Profissional (Sievap) tem como finalidade, EXCETO:",
+                alternativas: [
+                    "Planejar e coordenar as atividades de educação gerencial, técnica e operacional.",
+                    "Identificar e propor novas metodologias e técnicas de educação.",
+                    "Apresentar o orçamento anual da segurança pública.",
+                    "Apoiar e promover educação qualificada, continuada e integrada.",
+                    "Identificar e propor mecanismos de valorização profissional."
+                ],
+                correta: 2
+            },
+            {
+                id: 25,
+                pergunta: "A matriz curricular nacional constitui-se em referencial teórico, metodológico e avaliativo para as ações de educação aos profissionais de segurança pública.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 26,
+                pergunta: "A Rede Nacional de Altos Estudos em Segurança Pública (Renaesp) tem como objetivo, EXCETO:",
+                alternativas: [
+                    "Promover cursos de graduação, extensão e pós-graduação em segurança pública.",
+                    "Fomentar a integração entre as ações dos profissionais.",
+                    "Promover a compreensão do fenômeno da violência.",
+                    "Realizar o policiamento ostensivo em áreas de alto risco.",
+                    "Articular o conhecimento prático com os conhecimentos acadêmicos."
+                ],
+                correta: 3
+            },
+            {
+                id: 27,
+                pergunta: "O Programa Nacional de Qualidade de Vida para Profissionais de Segurança Pública (Pró-Vida) tem por objetivo elaborar, implementar, apoiar, monitorar e avaliar projetos de programas de atenção psicossocial e de saúde no trabalho.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 28,
+                pergunta: "Os Conselhos de Segurança Pública e Defesa Social terão natureza de colegiado, com competência:",
+                alternativas: [
+                    "Deliberativa e executiva.",
+                    "Consultiva, sugestiva e de acompanhamento social.",
+                    "Judicante e normativa.",
+                    "Legislativa e fiscalizadora.",
+                    "Apenas consultiva."
+                ],
+                correta: 1
+            },
+            {
+                id: 29,
+                pergunta: "A composição dos Conselhos de Segurança Pública inclui representantes do Poder Judiciário, do Ministério Público, da OAB, da Defensoria Pública, da sociedade civil e de entidades de profissionais de segurança pública.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 30,
+                pergunta: "Segundo o Art. 21 da Lei nº 13.675/2018, os mandatos eletivos dos membros da sociedade civil nos Conselhos de Segurança Pública terão duração de:",
+                alternativas: [
+                    "1 ano.",
+                    "2 anos, permitida apenas uma recondução ou reeleição.",
+                    "3 anos, permitida uma recondução.",
+                    "4 anos, sem reeleição.",
+                    "5 anos, permitida apenas uma reeleição."
+                ],
+                correta: 1
+            },
+            {
+                id: 31,
+                pergunta: "A União, os Estados, o Distrito Federal e os Municípios deverão instituir órgãos de ouvidoria dotados de autonomia e independência no exercício de suas atribuições.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 32,
+                pergunta: "São garantias previstas para os profissionais de segurança pública na Lei nº 13.675/2018, EXCETO:",
+                alternativas: [
+                    "Valorização profissional.",
+                    "Proteção da integridade física e moral.",
+                    "Participação em política partidária durante o serviço.",
+                    "Qualificação continuada.",
+                    "Acesso a programas de qualidade de vida."
+                ],
+                correta: 2
+            },
+            {
+                id: 33,
+                pergunta: "Os órgãos de correição, dotados de autonomia no exercício de suas competências, caberão o gerenciamento e a realização dos processos de apuração de responsabilidade funcional.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 34,
+                pergunta: "As conferências de segurança pública deverão ser realizadas para debater as diretrizes dos planos nacional, estaduais e municipais com qual periodicidade?",
+                alternativas: [
+                    "Anualmente.",
+                    "A cada 2 anos.",
+                    "A cada 3 anos.",
+                    "A cada 5 anos.",
+                    "A cada 10 anos."
+                ],
+                correta: 3
+            },
+            {
+                id: 35,
+                pergunta: "O Plano Nacional de Segurança Pública e Defesa Social deve considerar um contexto social amplo, com abrangência de outras áreas do serviço público, como educação, saúde, lazer e cultura.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 36,
+                pergunta: "Os Estados, o Distrito Federal e os Municípios deverão elaborar e implantar seus planos de segurança pública com base no Plano Nacional em até:",
+                alternativas: [
+                    "6 meses.",
+                    "1 ano.",
+                    "2 anos.",
+                    "3 anos.",
+                    "5 anos."
+                ],
+                correta: 2
+            },
+            {
+                id: 37,
+                pergunta: "Os integrantes do Sinesp que deixarem de fornecer ou atualizar seus dados poderão ser penalizados com a não percepção de recursos do Funpen e do Pronasci.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 38,
+                pergunta: "De acordo com a Lei nº 13.675/2018, as aquisições de bens e serviços para os órgãos integrantes do SUSP obedecerão a critérios técnicos de qualidade, modernidade, eficiência e resistência, observadas as normas de licitação.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            },
+            {
+                id: 39,
+                pergunta: "Qual das alternativas abaixo NÃO é uma diretriz da PNSPDS?",
+                alternativas: [
+                    "Ênfase nas ações de policiamento de proximidade.",
+                    "Distribuição do efetivo de acordo com critérios técnicos.",
+                    "Realização de operações de guerra em áreas urbanas.",
+                    "Unidade de registro de ocorrência policial.",
+                    "Uso de sistema integrado de informações e dados eletrônicos."
+                ],
+                correta: 2
+            },
+            {
+                id: 40,
+                pergunta: "A Lei nº 13.675/2018 entrou em vigor após decorridos 30 (trinta) dias de sua publicação oficial.",
+                alternativas: [
+                    "Verdadeiro",
+                    "Falso"
+                ],
+                correta: 0,
+                isVF: true
+            }
+        ];
+
+        // ================================================================
+        //  ESTADO DA APLICAÇÃO
+        // ================================================================
+        var estado = {
+            respondidas: 0,
+            acertos: 0,
+            erros: 0,
+            bloqueadas: {}
+        };
+
+        var letras = ["A", "B", "C", "D", "E"];
+
+        // ================================================================
+        //  RENDERIZAR QUESTÕES
+        // ================================================================
+        function renderizarQuestoes() {
+            var container = document.getElementById("questoes-container");
+            container.innerHTML = "";
+
+            for (var q = 0; q < questoesData.length; q++) {
+                var questao = questoesData[q];
+                
+                var divQuestao = document.createElement("div");
+                divQuestao.className = "questao";
+                divQuestao.id = "questao-" + questao.id;
+
+                var pergunta = document.createElement("div");
+                pergunta.className = "pergunta";
+                
+                var tipoTexto = questao.isVF ? "Verdadeiro/Falso" : "Múltipla Escolha";
+                pergunta.innerHTML = questao.id + ". " + questao.pergunta + ' <span class="badge-vf">' + tipoTexto + '</span>';
+                divQuestao.appendChild(pergunta);
+
+                var divAlt = document.createElement("div");
+                divAlt.className = "alternativas";
+
+                for (var i = 0; i < questao.alternativas.length; i++) {
+                    var alt = document.createElement("div");
+                    alt.className = "alternativa";
+                    alt.dataset.indice = i;
+                    alt.dataset.questaoId = questao.id;
+                    alt.id = "alt-" + questao.id + "-" + i;
+
+                    var label = document.createElement("span");
+                    label.className = "label";
+                    
+                    if (questao.isVF) {
+                        label.textContent = i === 0 ? "V)" : "F)";
+                    } else {
+                        label.textContent = letras[i] + ")";
+                    }
+                    
+                    alt.appendChild(label);
+
+                    var txt = document.createTextNode(" " + questao.alternativas[i]);
+                    alt.appendChild(txt);
+
+                    var feedback = document.createElement("span");
+                    feedback.className = "feedback";
+                    feedback.textContent = " ✓";
+                    alt.appendChild(feedback);
+
+                    alt.addEventListener("click", function(e) {
+                        var target = e.currentTarget;
+                        var questaoId = parseInt(target.dataset.questaoId);
+                        var indice = parseInt(target.dataset.indice);
+                        responderQuestao(questaoId, indice);
+                    });
+
+                    divAlt.appendChild(alt);
+                }
+
+                divQuestao.appendChild(divAlt);
+                container.appendChild(divQuestao);
+            }
+
+            atualizarResultado();
+        }
+
+        // ================================================================
+        //  RESPONDER QUESTÃO
+        // ================================================================
+        function responderQuestao(questaoId, indiceSelecionado) {
+            if (estado.bloqueadas[questaoId]) {
+                return;
+            }
+
+            var questao = null;
+            for (var q = 0; q < questoesData.length; q++) {
+                if (questoesData[q].id === questaoId) {
+                    questao = questoesData[q];
+                    break;
+                }
+            }
+            
+            if (!questao) return;
+
+            var isCorreta = (indiceSelecionado === questao.correta);
+
+            estado.bloqueadas[questaoId] = true;
+            estado.respondidas++;
+
+            if (isCorreta) {
+                estado.acertos++;
+            } else {
+                estado.erros++;
+            }
+
+            var divQuestao = document.getElementById("questao-" + questaoId);
+            if (isCorreta) {
+                divQuestao.className = "questao correta";
+            } else {
+                divQuestao.className = "questao errada";
+            }
+
+            var alternativas = divQuestao.querySelectorAll(".alternativa");
+            for (var i = 0; i < alternativas.length; i++) {
+                alternativas[i].classList.add("bloqueado");
+                if (i === questao.correta) {
+                    alternativas[i].classList.add("correta");
+                } else if (i === indiceSelecionado && !isCorreta) {
+                    alternativas[i].classList.add("errada");
+                }
+                alternativas[i].classList.remove("selecionada");
+            }
+
+            atualizarResultado();
+        }
+
+        // ================================================================
+        //  ATUALIZAR RESULTADO
+        // ================================================================
+        function atualizarResultado() {
+            document.getElementById("acertos").textContent = estado.acertos;
+            document.getElementById("erros").textContent = estado.erros;
+            document.getElementById("total").textContent = estado.respondidas;
+        }
+
+        // ================================================================
+        //  REINICIAR
+        // ================================================================
+        function reiniciar() {
+            estado = {
+                respondidas: 0,
+                acertos: 0,
+                erros: 0,
+                bloqueadas: {}
+            };
+            renderizarQuestoes();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        // ================================================================
+        //  INICIALIZAR
+        // ================================================================
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", renderizarQuestoes);
+        } else {
+            renderizarQuestoes();
+        }
+    </script>
+</body>
+</html>
